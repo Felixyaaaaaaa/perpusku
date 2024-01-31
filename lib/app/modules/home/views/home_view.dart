@@ -24,7 +24,6 @@ class HomeView extends GetView<HomeController> {
             ElevatedButton(
               onPressed: () => Get.toNamed(Routes.PEMINJAMAN),
               child: Text('Peminjaman'),
-              // button pinjam
             ),
           ],
         ),
