@@ -1,17 +1,20 @@
-import 'dart:html';
 
-import 'package:dio/dio.dart' as dio;
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:peminjam_perpustakaan_kelas_c/app/data/provider/storage_provider.dart';
 
 import '../../../data/contant/endpoint.dart';
 import '../../../data/provider/api_provider.dart';
+import '../../../routes/app_pages.dart';
+import '../../../theme/colors.dart';
 
 class AddPeminjamanController extends GetxController {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final TextEditingController user_idController = TextEditingController();
-  final TextEditingController book_idController = TextEditingController();
+  // final TextEditingController user_idController = TextEditingController();
+  // final TextEditingController book_idController = TextEditingController();
   final TextEditingController tanggal_pinjamController = TextEditingController();
   final TextEditingController tanggal_kembaliController = TextEditingController();
   final loading = false.obs;
@@ -32,41 +35,109 @@ class AddPeminjamanController extends GetxController {
     super.onClose();
   }
 
-  addpinjam() async {
+  addPeminjaman(BuildContext context) async {
     loading(true);
     try {
-      FocusScope.of(Get.context!).unfocus(); //nge close keyboard
+      FocusScope.of(Get.context!).unfocus();
       formKey.currentState?.save();
       if (formKey.currentState!.validate()) {
         final response = await ApiProvider.instance().post(Endpoint.pinjam,
             data: {
-              'tanggal_pinjam': tanggal_pinjamController.text.toString(),
-              'tanggal_kembali': tanggal_kembaliController.text.toString(),
-              'user_id': int.parse(StorageProvider.read(StorageKey.idUser)),
-              'book_id': int.parse(Get.parameters['id'].toString())
+              "user_id": StorageProvider.read(StorageKey.idUser),
+              "buku_id":  int.parse(Get.parameters['id'].toString()),
+              "tanggal_pinjam": tanggal_pinjamController.text.toString(),
+              "tanggal_kembali": tanggal_kembaliController.text.toString(),
             });
-        if (response.statusCode == 201) {
-          Get.back();
+        if (response.statusCode == 200) {
+          _showLogoutConfirmationDialog(context);
         } else {
-          Get.snackbar('Sorry', 'Login Gagal', backgroundColor: Colors.orange);
+          Get.snackbar("Sorry", "Tambah Pinjam Gagal", backgroundColor: Colors.orange);
         }
       }
       loading(false);
-    } on dio.DioException catch (e) {
+    } on DioException catch (e) {
       loading(false);
       if (e.response != null) {
         if (e.response?.data != null) {
-          Get.snackbar('Sorry', '${e.response?.data['message']}',
+          Get.snackbar("Sorry", "${e.response?.data['message']}",
               backgroundColor: Colors.orange);
         }
       } else {
-        Get.snackbar('Sorry', e.message ?? '', backgroundColor: Colors.red);
+        Get.snackbar("Sorry", e.message ?? "", backgroundColor: Colors.red);
       }
     } catch (e) {
       loading(false);
-      Get.snackbar('Error', e.toString(), backgroundColor: Colors.red);
+      Get.snackbar("Error", e.toString(), backgroundColor: Colors.red);
     }
   }
 
   void increment() => count.value++;
+
+
+  }
+
+
+void _showLogoutConfirmationDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(
+          'Berhasil',
+          style: GoogleFonts.poppins(
+            color: text_bold,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        backgroundColor: button_white,
+        content: Text(
+          'Buku telah dipinjam',
+          style: GoogleFonts.poppins(
+            color: card,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        actions: <Widget>[
+          ButtonBar(
+            children: [
+              TextButton(
+                onPressed: () {
+                  Get.toNamed(
+                    Routes.PEMINJAMAN,
+                    parameters: {
+                      'id':
+                      '${Get.parameters['id'].toString()}',
+                      'judul': '${Get.parameters['judul']}',
+                      'image': '${Get.parameters['image']}',
+                      'penulis':
+                      '${Get.parameters['penulis']}',
+                      'penerbit':
+                      '${Get.parameters['penerbit']}',
+                      'tahun_terbit':
+                      '${Get.parameters['tahun_terbit']}',
+                      'deskripsi_buku':
+                      '${Get.parameters['deskripsi_buku']}',
+                      'nama_kategory':
+                      '${Get.parameters['nama_kategory']}',
+                      'rating':
+                      '${Get.parameters['rating']}',
+                    },
+                  );
+                },
+                child: Text(
+                  'OK',
+                  style: GoogleFonts.poppins(
+                    color: text_bold,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
+    },
+  );
 }
+
+

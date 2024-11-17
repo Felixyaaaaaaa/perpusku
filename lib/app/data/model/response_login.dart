@@ -1,84 +1,78 @@
-/// status : 200
-/// message : "Login Success"
-/// data : {"id":1,"username":"testing","nama":"Romli","telp":"085334","alamat":"Solo","role":"PETUGAS","created_at":"2024-01-09T01:55:16.000000Z","updated_at":"2024-01-09T01:55:16.000000Z"}
+/// message : "Login berhasil"
+/// user : {"id":4,"nama_lengkap":"jose","username":"jos","password":"0842","email":"jose@gmail.com","alamat":"sukoharjo"}
 
 class ResponseLogin {
   ResponseLogin({
-      this.status, 
       this.message, 
-      this.data,});
+      this.user,});
 
   ResponseLogin.fromJson(dynamic json) {
-    status = json['status'];
     message = json['message'];
-    data = json['data'] != null ? DataLogin.fromJson(json['data']) : null;
+    user = json['user'] != null ? User.fromJson(json['user']) : null;
   }
-  int? status;
   String? message;
-  DataLogin? data;
+  User? user;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
-    map['status'] = status;
     map['message'] = message;
-    if (data != null) {
-      map['data'] = data?.toJson();
+    if (user != null) {
+      map['user'] = user?.toJson();
     }
     return map;
   }
 
 }
 
-/// id : 1
-/// username : "testing"
-/// nama : "Romli"
-/// telp : "085334"
-/// alamat : "Solo"
-/// role : "PETUGAS"
-/// created_at : "2024-01-09T01:55:16.000000Z"
-/// updated_at : "2024-01-09T01:55:16.000000Z"
+/// id : 4
+/// nama_lengkap : "jose"
+/// username : "jos"
+/// password : "0842"
+/// email : "jose@gmail.com"
+/// alamat : "sukoharjo"
 
-class DataLogin {
-  DataLogin({
-      this.id, 
-      this.username, 
-      this.nama, 
-      this.telp, 
-      this.alamat, 
-      this.role, 
-      this.createdAt, 
-      this.updatedAt,});
+class User {
+  User({
+    this.id,
+    this.image,
+    this.namaLengkap,
+    this.username,
+    this.password,
+    this.email,
+    this.alamat,
+    this.role,
+  });
 
-  DataLogin.fromJson(dynamic json) {
-    id = json['id'];
+  User.fromJson(dynamic json) {
+    id = json['user_id'];
+    image = json['image']; // Sesuaikan dengan nama properti yang benar
+    namaLengkap = json['nama_lengkap'];
     username = json['username'];
-    nama = json['nama'];
-    telp = json['telp'];
+    password = json['password'];
+    email = json['email'];
     alamat = json['alamat'];
     role = json['role'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
   }
+
   int? id;
+  String? image; // Ubah sesuai key yang sesuai di respons
+  String? namaLengkap;
   String? username;
-  String? nama;
-  String? telp;
+  String? password;
+  String? email;
   String? alamat;
   String? role;
-  String? createdAt;
-  String? updatedAt;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['id'] = id;
+    map['image'] = image;
+    map['nama_lengkap'] = namaLengkap;
     map['username'] = username;
-    map['nama'] = nama;
-    map['telp'] = telp;
+    map['password'] = password;
+    map['email'] = email;
     map['alamat'] = alamat;
     map['role'] = role;
-    map['created_at'] = createdAt;
-    map['updated_at'] = updatedAt;
     return map;
   }
-
 }

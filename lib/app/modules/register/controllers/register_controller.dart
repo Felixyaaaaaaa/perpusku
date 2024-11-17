@@ -5,14 +5,15 @@ import 'package:peminjam_perpustakaan_kelas_c/app/modules/login/controllers/logi
 
 import '../../../data/contant/endpoint.dart';
 import '../../../data/provider/api_provider.dart';
+import '../../../routes/app_pages.dart';
 
 class RegisterController extends GetxController {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final TextEditingController namaController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
-  final TextEditingController telpController = TextEditingController();
-  final TextEditingController alamatController = TextEditingController();
+  final TextEditingController namalengkapController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController alamatController = TextEditingController();
   final loading = false.obs;
 
 
@@ -40,14 +41,14 @@ class RegisterController extends GetxController {
       if (formKey.currentState!.validate()) {
         final response = await ApiProvider.instance().post(Endpoint.register,
             data: {
-              'nama': namaController.text.toString(),
+              'nama_lengkap': namalengkapController.text.toString(),
               'username': usernameController.text.toString(),
-              'telp': telpController.text.toString(),
-              'alamat': alamatController.text.toString(),
               'password': passwordController.text.toString(),
+              'email': emailController.text.toString(),
+              'alamat': alamatController.text.toString(),
             });
-        if (response.statusCode == 201) {
-          Get.back();
+        if (response.statusCode == 200) {
+          Get.toNamed(Routes.LOGIN);
         } else {
           Get.snackbar('Sorry', 'Register Gagal', backgroundColor: Colors.orange);
         }

@@ -13,7 +13,7 @@ import '../../../routes/app_pages.dart';
 
 class LoginController extends GetxController {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final TextEditingController usenameController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final loading = false.obs;
 
@@ -25,11 +25,18 @@ class LoginController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    // cek status login jika sudah login akan di redirect ke menu home
     String status = StorageProvider.read(StorageKey.status);
-    log('status : $status');
+    String role = StorageProvider.read(StorageKey.role);
     if (status == 'logged') {
-      Get.offAllNamed(Routes.HOME);
+      // Jika sudah login, arahkan ke halaman beranda sesuai dengan peran pengguna
+      if (role == 'PEMINJAM') {
+        Get.offAllNamed(Routes.HOME);
+      } else if (role == 'PETUGAS') {
+        Get.offAllNamed(Routes.HOME_PETUGAS);
+      } else {
+        // Handle other roles or scenarios here
+        Get.snackbar('Sorry', 'Role not supported', backgroundColor: Colors.orange);
+      }
     }
   }
 
@@ -45,26 +52,36 @@ class LoginController extends GetxController {
       formKey.currentState?.save();
       if (formKey.currentState!.validate()) {
         final response = await ApiProvider.instance().post(Endpoint.login,
-            data: dio.FormData.fromMap({
-              'username': usenameController.text.toString(),
+            data: {
+              'username': usernameController.text.toString(),
               'password': passwordController.text.toString()
-            }));
+            });
         if (response.statusCode == 200) {
           final ResponseLogin responseLogin = ResponseLogin.fromJson(response.data);
           await StorageProvider.write(StorageKey.status, 'logged');
-          await StorageProvider.write(StorageKey.idUser, responseLogin.data!.id!.toString());
-          Get.offAllNamed(Routes.HOME);
+          await StorageProvider.write(StorageKey.role, responseLogin.user!.role.toString()); // Simpan peran pengguna
+          await StorageProvider.write(StorageKey.idUser, responseLogin.user!.id.toString());
+          await StorageProvider.write(StorageKey.username, responseLogin.user!.username.toString());
+          await StorageProvider.write(StorageKey.image_profile, responseLogin.user!.image.toString());
+
+          // Check the role and navigate accordingly
+          if (responseLogin.user!.role == 'PEMINJAM') {
+            Get.offAllNamed(Routes.HOME);
+          } else if (responseLogin.user!.role == 'PETUGAS') {
+            Get.offAllNamed(Routes.HOME_PETUGAS);
+          } else {
+            // Handle other roles or scenarios here
+            Get.snackbar('Sorry', 'Role not supported', backgroundColor: Colors.orange);
+          }
         } else {
           Get.snackbar('Sorry', 'Login Gagal', backgroundColor: Colors.orange);
         }
       }
-      loading(false);
-    } on dio.DioException catch (e) {
+    } on dio.DioError catch (e) {
       loading(false);
       if (e.response != null) {
-        if (e.response?.data != null) {
-          Get.snackbar('Sorry', '${e.response?.data['message']}',
-              backgroundColor: Colors.orange);
+        if (e.response!.data != null) {
+          Get.snackbar('Sorry', '${e.response!.data['message']}', backgroundColor: Colors.orange);
         }
       } else {
         Get.snackbar('Sorry', e.message ?? '', backgroundColor: Colors.red);
@@ -72,6 +89,11 @@ class LoginController extends GetxController {
     } catch (e) {
       loading(false);
       Get.snackbar('Error', e.toString(), backgroundColor: Colors.red);
+    } finally {
+      loading(false);
     }
   }
+
+
+
 }

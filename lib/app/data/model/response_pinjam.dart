@@ -1,211 +1,161 @@
-/// status : 200
-/// message : "success"
-/// data : [{"id":1,"user_id":2,"book_id":1,"tanggal_pinjam":"2024-01-01 00:00:00","tanggal_kembali":"2024-01-10 00:00:00","status":"DIPINJAM","created_at":"2024-01-09T06:09:06.000000Z","updated_at":"2024-01-09T06:09:06.000000Z","user":{"id":2,"username":"said","nama":"said","telp":"085","alamat":"alamat","role":"PEMINJAM","created_at":"2024-01-09T05:36:44.000000Z","updated_at":"2024-01-09T05:36:44.000000Z"},"book":{"id":1,"kategori_id":1,"judul":"Belajar mengenal angka","penulis":"kusnaidi","penerbit":"PT alangka","tahun_terbit":2024,"created_at":"2024-01-09T05:43:09.000000Z","updated_at":"2024-01-09T05:43:09.000000Z"}}]
+import 'dart:convert';
 
+// Fungsi untuk mengonversi JSON menjadi ResponsePinjam
+ResponsePinjam responsePinjamFromJson(String str) =>
+    ResponsePinjam.fromJson(json.decode(str));
+
+// Fungsi untuk mengonversi ResponsePinjam menjadi JSON
+// String responseBookToJson(ResponsePinjam data) => json.encode(data.toJson());
+
+// Menggunakan ResponsePinjam untuk mengelola data JSON
 class ResponsePinjam {
   ResponsePinjam({
-      this.status, 
-      this.message, 
-      this.data,});
+    this.statusCode,
+    this.message,
+    this.data,
+  });
 
-  ResponsePinjam.fromJson(dynamic json) {
-    status = json['status'];
-    message = json['message'];
-    if (json['data'] != null) {
-      data = [];
-      json['data'].forEach((v) {
-        data?.add(DataPinjam.fromJson(v));
-      });
-    }
-  }
-  int? status;
+  int? statusCode;
   String? message;
   List<DataPinjam>? data;
 
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['status'] = status;
-    map['message'] = message;
-    if (data != null) {
-      map['data'] = data?.map((v) => v.toJson()).toList();
-    }
-    return map;
+  factory ResponsePinjam.fromJson(List<dynamic> json) {
+    return ResponsePinjam(
+      statusCode: json[0]["Statuscode"],
+      message: json[0]["message"],
+      data: List<DataPinjam>.from(json[0]["data"].map((x) => DataPinjam.fromJson(x))),
+    );
   }
-
 }
 
-/// id : 1
-/// user_id : 2
-/// book_id : 1
-/// tanggal_pinjam : "2024-01-01 00:00:00"
-/// tanggal_kembali : "2024-01-10 00:00:00"
-/// status : "DIPINJAM"
-/// created_at : "2024-01-09T06:09:06.000000Z"
-/// updated_at : "2024-01-09T06:09:06.000000Z"
-/// user : {"id":2,"username":"said","nama":"said","telp":"085","alamat":"alamat","role":"PEMINJAM","created_at":"2024-01-09T05:36:44.000000Z","updated_at":"2024-01-09T05:36:44.000000Z"}
-/// book : {"id":1,"kategori_id":1,"judul":"Belajar mengenal angka","penulis":"kusnaidi","penerbit":"PT alangka","tahun_terbit":2024,"created_at":"2024-01-09T05:43:09.000000Z","updated_at":"2024-01-09T05:43:09.000000Z"}
 
-class DataPinjam {
-  DataPinjam({
-      this.id, 
-      this.userId,
-      this.bookId, 
-      this.tanggalPinjam, 
-      this.tanggalKembali, 
-      this.status, 
-      this.createdAt, 
-      this.updatedAt, 
-      this.user, 
-      this.book,});
+class Buku {
+  Buku({
+    this.judul,
+    this.penulis,
+    this.penerbit,
+    this.tahunTerbit,
+    this.image,
+    this.deskripsiBuku,
+  });
 
-  DataPinjam.fromJson(dynamic json) {
-    id = json['id'];
-    userId = json['user_id'];
-    bookId = json['book_id'];
-    tanggalPinjam = json['tanggal_pinjam'];
-    tanggalKembali = json['tanggal_kembali'];
-    status = json['status'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
-    user = json['user'] != null ? User.fromJson(json['user']) : null;
-    book = json['book'] != null ? Book.fromJson(json['book']) : null;
-  }
-  int? id;
-  String? userId;
-  String? bookId;
-  String? tanggalPinjam;
-  String? tanggalKembali;
-  String? status;
-  String? createdAt;
-  String? updatedAt;
-  User? user;
-  Book? book;
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['id'] = id;
-    map['user_id'] = userId;
-    map['book_id'] = bookId;
-    map['tanggal_pinjam'] = tanggalPinjam;
-    map['tanggal_kembali'] = tanggalKembali;
-    map['status'] = status;
-    map['created_at'] = createdAt;
-    map['updated_at'] = updatedAt;
-    if (user != null) {
-      map['user'] = user?.toJson();
-    }
-    if (book != null) {
-      map['book'] = book?.toJson();
-    }
-    return map;
-  }
-
-}
-
-/// id : 1
-/// kategori_id : 1
-/// judul : "Belajar mengenal angka"
-/// penulis : "kusnaidi"
-/// penerbit : "PT alangka"
-/// tahun_terbit : 2024
-/// created_at : "2024-01-09T05:43:09.000000Z"
-/// updated_at : "2024-01-09T05:43:09.000000Z"
-
-class Book {
-  Book({
-      this.id, 
-      this.kategoriId, 
-      this.judul, 
-      this.penulis, 
-      this.penerbit, 
-      this.tahunTerbit, 
-      this.createdAt, 
-      this.updatedAt,});
-
-  Book.fromJson(dynamic json) {
-    id = json['id'];
-    kategoriId = json['kategori_id'];
-    judul = json['judul'];
-    penulis = json['penulis'];
-    penerbit = json['penerbit'];
-    tahunTerbit = json['tahun_terbit'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
-  }
-  int? id;
-  String? kategoriId;
   String? judul;
   String? penulis;
   String? penerbit;
-  String? tahunTerbit;
-  String? createdAt;
-  String? updatedAt;
+  int? tahunTerbit;
+  String? image;
+  String? deskripsiBuku;
 
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['id'] = id;
-    map['kategori_id'] = kategoriId;
-    map['judul'] = judul;
-    map['penulis'] = penulis;
-    map['penerbit'] = penerbit;
-    map['tahun_terbit'] = tahunTerbit;
-    map['created_at'] = createdAt;
-    map['updated_at'] = updatedAt;
-    return map;
-  }
+  factory Buku.fromJson(Map<String, dynamic> json) => Buku(
+    judul: json["judul"],
+    penulis: json["penulis"],
+    penerbit: json["penerbit"],
+    tahunTerbit: json["tahun_terbit"],
+    image: json["image"],
+    deskripsiBuku: json["deskripsi_buku"],
+  );
 
+  Map<String, dynamic> toJson() => {
+    "judul": judul,
+    "penulis": penulis,
+    "penerbit": penerbit,
+    "tahun_terbit": tahunTerbit,
+    "image": image,
+    "deskripsi_buku": deskripsiBuku,
+  };
 }
 
-/// id : 2
-/// username : "said"
-/// nama : "said"
-/// telp : "085"
-/// alamat : "alamat"
-/// role : "PEMINJAM"
-/// created_at : "2024-01-09T05:36:44.000000Z"
-/// updated_at : "2024-01-09T05:36:44.000000Z"
+class DataPinjam {
+  DataPinjam({
+    this.id,
+    this.userId,
+    this.bukuId,
+    this.tanggalPinjam,
+    this.tanggalKembali,
+    this.status,
+    this.buku,
+  });
 
-class User {
-  User({
-      this.id, 
-      this.username, 
-      this.nama, 
-      this.telp, 
-      this.alamat, 
-      this.role, 
-      this.createdAt, 
-      this.updatedAt,});
-
-  User.fromJson(dynamic json) {
-    id = json['id'];
-    username = json['username'];
-    nama = json['nama'];
-    telp = json['telp'];
-    alamat = json['alamat'];
-    role = json['role'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
-  }
   int? id;
-  String? username;
-  String? nama;
-  String? telp;
-  String? alamat;
-  String? role;
-  String? createdAt;
-  String? updatedAt;
+  String? userId;
+  String? bukuId;
+  String? tanggalPinjam;
+  String? tanggalKembali;
+  String? status;
+  Buku? buku;
 
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['id'] = id;
-    map['username'] = username;
-    map['nama'] = nama;
-    map['telp'] = telp;
-    map['alamat'] = alamat;
-    map['role'] = role;
-    map['created_at'] = createdAt;
-    map['updated_at'] = updatedAt;
-    return map;
-  }
+  factory DataPinjam.fromJson(Map<String, dynamic> json) => DataPinjam(
+    id: json["id"],
+    userId : json["user_id"],
+    bukuId : json["buku_id"],
+    tanggalPinjam : json["tanggal_pinjam"],
+    tanggalKembali : json["tanggal_kembali"],
+    status : json["status"],
+    buku: json["buku"] != null ? Buku.fromJson(json["buku"]) : null,
+  );
 
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "user_id": userId,
+    "buku_id": bukuId,
+    "tanggal_pinjam": tanggalPinjam,
+    "tanggal_kembali": tanggalKembali,
+    "status": status,
+    "buku": buku != null ? buku!.toJson() : null, // Mengonversi properti buku ke JSON jika tidak null
+  };
+}
+
+
+void main() {
+  // Contoh penggunaan
+  String jsonString = '''
+
+    {
+        "Statuscode": 200,
+        "message": "SUCCESS",
+        "data": [
+            {
+                "id": 6,
+                "user_id": "1",
+                "buku_id": "6",
+                "tanggal_pinjam": "2024-02-26T17:00:00.000Z",
+                "tanggal_kembali": "2024-02-28T17:00:00.000Z",
+                "status": "DIPINJAM",
+                "buku": {
+                    "judul": "solo leveling",
+                    "penulis": "ptj",
+                    "penerbit": "gramedia",
+                    "tahun_terbit": 2023,
+                    "image": "http://192.168.1.11:3000/image/image_1708315289688.jpg",
+                    "deskripsi_buku": "tes"
+                }
+            }
+        ]
+    }
+  ''';
+
+  // Mengonversi JSON menjadi objek Dart
+  ResponsePinjam responsePinjam = responsePinjamFromJson(jsonString);
+
+  // Mencetak data buku dari objek Dart
+  print('Status Code: ${responsePinjam.statusCode}');
+  print('Message: ${responsePinjam.message}');
+  print('Data Pinjam:');
+  responsePinjam.data!.forEach((dataPinjam) {
+    print('  - ID: ${dataPinjam.id}');
+    print('    userId: ${dataPinjam.userId}');
+    print('    bukuId: ${dataPinjam.bukuId}');
+    print('    tanggalPinjam: ${dataPinjam.tanggalPinjam}');
+    print('    tanggalKembali: ${dataPinjam.tanggalKembali}');
+    print('    status: ${dataPinjam.status}');
+     if (dataPinjam.buku != null) {
+      print('    Buku:');
+      print('      Judul: ${dataPinjam.buku!.judul}');
+      print('      Penulis: ${dataPinjam.buku!.penulis}');
+      print('      Penerbit: ${dataPinjam.buku!.penerbit}');
+      print('      Tahun Terbit: ${dataPinjam.buku!.tahunTerbit}');
+      print('      Image: ${dataPinjam.buku!.image}');
+      print('      Deskripsi: ${dataPinjam.buku!.deskripsiBuku}');
+    }
+  });
 }

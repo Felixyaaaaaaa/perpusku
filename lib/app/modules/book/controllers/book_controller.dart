@@ -12,6 +12,7 @@ class BookController extends GetxController with StateMixin<List<DataBook>> {
   @override
   void onInit() {
     super.onInit();
+    getData();
   }
 
   @override

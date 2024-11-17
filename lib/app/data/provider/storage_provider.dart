@@ -1,4 +1,7 @@
+import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+
+import '../../routes/app_pages.dart';
 
 
 class StorageProvider {
@@ -15,14 +18,22 @@ class StorageProvider {
     }
   }
 
+  static delete(key) async {
+    await GetStorage().remove(key);
+  }
 
   static void clearAll() {
     GetStorage().erase();
+    Get.toNamed(Routes.LOGIN);
   }
 }
 
 
 class StorageKey {
   static const String status = "status";
+  static const String role = "role";
+  static const String username = "username";
+  static const String image_profile = "image_profile";
   static const String idUser = "idUser";
+  static const String idBuku = "idBuku";
 }
